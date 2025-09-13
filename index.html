@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bin Butler - Worker Proof</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Bin Butler Proof Upload</h1>
+
+  <label for="email">Customer Email:</label><br>
+  <input type="email" id="email" placeholder="example@email.com"><br><br>
+
+  <label for="photoInput">Take Photo:</label><br>
+  <input type="file" accept="image/*" capture="camera" id="photoInput"><br><br>
+
+  <img id="preview" class="preview" alt="Preview will appear here"><br>
+
+  <p id="gps">GPS: (waiting...)</p>
+  <p id="timestamp"></p>
+
+  <button id="sendBtn">Send Proof</button>
+
+  <script src="script.js"></script>
+</body>
+</html>
