@@ -60,7 +60,7 @@
   }
   
   button {
-    background-color: #ff6b6b; /* modern accent color */
+    background-color: #ff4c4c; /* modern accent color */
     color: #fff;
     border: none;
     border-radius: 10px;
@@ -71,7 +71,8 @@
   }
   
   button:hover {
-    background-color: #ff4c4c;
+    background-color: #fff;
+    color:#ff4c4c
   }
   
   @media (max-width: 400px) {
