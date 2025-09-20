@@ -4,11 +4,12 @@ const preview = document.getElementById("preview");
 const gpsOutput = document.getElementById("gps");
 const timeOutput = document.getElementById("timestamp");
 const sendBtn = document.getElementById("sendBtn");
+const skipReason = document.getElementById("skipReason");
 
 let photoData = null;
 let gpsData = null;
 
-// Handle photo upload
+// --- Handle Photo Upload ---
 photoInput.addEventListener("change", (event) => {
   const file = event.target.files[0];
   if (!file) return;
@@ -21,47 +22,59 @@ photoInput.addEventListener("change", (event) => {
   reader.readAsDataURL(file);
 });
 
-// Get GPS location
+// --- GPS Location ---
 function updateGPS() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const { latitude, longitude } = pos.coords;
-        gpsData = { latitude, longitude };
-        gpsOutput.innerText = `GPS: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
-      },
-      (err) => {
-        gpsOutput.innerText = "GPS unavailable";
-        console.error(err);
-      }
-    );
-  } else {
-    gpsOutput.innerText = "GPS not supported";
-  }
-}
-updateGPS();
-
-// Handle send proof
-sendBtn.addEventListener("click", () => {
-  const email = document.getElementById("email").value;
-  const address = document.getElementById("address").value;
-
-  if (!email || !address || !photoData) {
-    alert("Please enter email, address, and take a photo!");
+  if (!navigator.geolocation) {
+    gpsOutput.innerText = "GPS not supported on this device";
     return;
   }
 
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const { latitude, longitude } = pos.coords;
+      gpsData = { latitude, longitude };
+      gpsOutput.innerText = `GPS: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+    },
+    (err) => {
+      gpsOutput.innerText = "GPS unavailable";
+      console.error(err);
+    }
+  );
+}
+updateGPS();
+
+// --- Send Proof ---
+sendBtn.addEventListener("click", () => {
+  const email = document.getElementById("email").value.trim();
+  const address = document.getElementById("address").value.trim();
+  const reason = skipReason.value.trim();
+
+  // Validate inputs
+  if (!email || !address) {
+    alert("Please enter both email and address.");
+    return;
+  }
+
+  if (!photoData && !reason) {
+    alert("Please upload a photo OR explain why pickup was skipped.");
+    return;
+  }
+
+  // Create timestamp
   const currentTime = new Date().toLocaleString();
   timeOutput.innerText = "Time: " + currentTime;
 
-  // Log captured data (later you can send to Google Sheets or backend)
-  console.log("Captured Data:", {
+  // Collect data
+  const proofData = {
     email,
     address,
-    photoData,
+    photoData: photoData || "No photo provided",
     gpsData,
-    time: currentTime
-  });
+    time: currentTime,
+    reason: reason || "Pickup completed"
+  };
 
-  alert("Proof captured with new timestamp!");
+  console.log("Captured Data:", proofData);
+
+  alert("Proof recorded successfully!");
 });
