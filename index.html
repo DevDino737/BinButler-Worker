@@ -8,20 +8,25 @@
 </head>
 <body>
   <div class="container">
-    <h1>BinButler Worker Proof</h1>
+    <h1>BinButler Proof Capture</h1>
+    <p class="subtitle">Submit photo proof or explain why pickup was skipped.</p>
 
     <!-- Email -->
-    <label for="email">Customer Email:</label>
-    <input type="email" id="email" placeholder="Enter customer email">
+    <label for="email">Customer Email</label>
+    <input type="email" id="email" placeholder="Enter customer email" required>
 
     <!-- Address -->
-    <label for="address">Customer Address:</label>
-    <input type="text" id="address" placeholder="Enter customer address">
+    <label for="address">Customer Address</label>
+    <input type="text" id="address" placeholder="Enter customer address" required>
 
     <!-- Photo Upload -->
-    <label for="photoInput">Upload Photo Proof:</label>
+    <label for="photoInput">Upload Photo Proof</label>
     <input type="file" id="photoInput" accept="image/*" capture="environment">
     <img id="preview" alt="Preview will appear here">
+
+    <!-- Skip Reason -->
+    <label for="skipReason">Skip Reason (optional)</label>
+    <textarea id="skipReason" placeholder="Explain why pickup was skipped..."></textarea>
 
     <!-- GPS + Time -->
     <p id="gps">GPS: Loading...</p>

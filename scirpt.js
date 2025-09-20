@@ -49,7 +49,7 @@ sendBtn.addEventListener("click", () => {
   const address = document.getElementById("address").value.trim();
   const reason = skipReason.value.trim();
 
-  // Validate inputs
+  // Validation
   if (!email || !address) {
     alert("Please enter both email and address.");
     return;
@@ -64,7 +64,7 @@ sendBtn.addEventListener("click", () => {
   const currentTime = new Date().toLocaleString();
   timeOutput.innerText = "Time: " + currentTime;
 
-  // Collect data
+  // Collect proof data
   const proofData = {
     email,
     address,
@@ -76,5 +76,5 @@ sendBtn.addEventListener("click", () => {
 
   console.log("Captured Data:", proofData);
 
-  alert("Proof recorded successfully!");
+  alert("✅ Proof recorded successfully!");
 });
