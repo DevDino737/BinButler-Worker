@@ -1,22 +1,28 @@
-// Elements
+// --- Customer Database ---
+const customers = [
+  { name: "Jacob", address: "123 Main St", email: "jacob@example.com" },
+  { name: "Matthew", address: "456 Oak Ave", email: "matthew@example.com" }
+];
+
+// --- Elements ---
+const nameInput = document.getElementById("customerName");
+const addressInput = document.getElementById("address");
+const emailInput = document.getElementById("email");
+const suggestions = document.getElementById("suggestions");
 const photoInput = document.getElementById("photo");
 const preview = document.getElementById("preview");
 const gpsOutput = document.getElementById("gps");
 const timeOutput = document.getElementById("timestamp");
 const form = document.getElementById("proofForm");
-const toast = document.getElementById("toast");
-const customerSelect = document.getElementById("customer");
-const addressInput = document.getElementById("address");
-const skipReason = document.getElementById("reason");
+const popup = document.getElementById("popup");
 
 let photoData = null;
 let gpsData = null;
 
-// --- Handle Photo Upload ---
+// --- Photo Upload ---
 photoInput.addEventListener("change", (event) => {
   const file = event.target.files[0];
   if (!file) return;
-
   const reader = new FileReader();
   reader.onload = (e) => {
     photoData = e.target.result;
@@ -25,13 +31,7 @@ photoInput.addEventListener("change", (event) => {
   reader.readAsDataURL(file);
 });
 
-// --- Autofill address from dropdown ---
-customerSelect.addEventListener("change", () => {
-  const option = customerSelect.options[customerSelect.selectedIndex];
-  addressInput.value = option.dataset.address || "";
-});
-
-// --- GPS Location ---
+// --- GPS ---
 function updateGPS() {
   if (!navigator.geolocation) {
     gpsOutput.innerText = "GPS not supported on this device";
@@ -51,31 +51,61 @@ function updateGPS() {
 }
 updateGPS();
 
-// --- Show popup ---
-function showToast(message, success = true) {
-  toast.innerText = message;
-  toast.style.background = success ? "#4caf50" : "#d32f2f";
-  toast.className = "show";
-  setTimeout(() => {
-    toast.className = toast.className.replace("show", "");
-  }, 3000);
+// --- Suggestions Logic ---
+nameInput.addEventListener("input", () => {
+  const query = nameInput.value.toLowerCase();
+  suggestions.innerHTML = "";
+
+  if (!query) return;
+
+  const matches = customers.filter(c =>
+    c.name.toLowerCase().startsWith(query)
+  );
+
+  matches.forEach(c => {
+    const item = document.createElement("div");
+    item.textContent = c.name;
+    item.classList.add("suggestion-item");
+    item.addEventListener("click", () => {
+      nameInput.value = c.name;
+      addressInput.value = c.address;
+      emailInput.value = c.email;
+      suggestions.innerHTML = "";
+    });
+    suggestions.appendChild(item);
+  });
+});
+
+document.addEventListener("click", (e) => {
+  if (!suggestions.contains(e.target) && e.target !== nameInput) {
+    suggestions.innerHTML = "";
+  }
+});
+
+// --- Popup ---
+function showPopup(message, success = true) {
+  popup.textContent = message;
+  popup.style.background = success ? "#4caf50" : "#d41010";
+  popup.classList.add("show");
+  setTimeout(() => popup.classList.remove("show"), 3000);
 }
 
-// --- Handle Form Submit ---
+// --- Form Submit ---
 form.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  const email = customerSelect.value;
-  const address = addressInput.value;
-  const reason = skipReason.value.trim();
+  const name = nameInput.value.trim();
+  const email = emailInput.value.trim();
+  const address = addressInput.value.trim();
+  const reason = document.getElementById("reason").value.trim();
 
-  if (!email || !address) {
-    showToast("⚠️ Please select a customer", false);
+  if (!name || !email || !address) {
+    showPopup("❌ Please fill in all required fields", false);
     return;
   }
 
   if (!photoData && !reason) {
-    showToast("⚠️ Upload a photo OR add skip reason", false);
+    showPopup("❌ Provide a photo or a reason", false);
     return;
   }
 
@@ -83,6 +113,7 @@ form.addEventListener("submit", (e) => {
   timeOutput.innerText = "Time: " + currentTime;
 
   const proofData = {
+    name,
     email,
     address,
     photoData: photoData || "No photo provided",
@@ -91,7 +122,6 @@ form.addEventListener("submit", (e) => {
     reason: reason || "Pickup completed"
   };
 
-  console.log("Captured Data:", proofData);
-
-  showToast("✅ Proof recorded successfully!");
+  console.log("Captured Proof:", proofData);
+  showPopup("✅ Proof submitted successfully!");
 });
