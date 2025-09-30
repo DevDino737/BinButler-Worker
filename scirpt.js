@@ -1,14 +1,14 @@
 // --- Customer Database ---
-const customers = [
-  { name: "Jacob", address: "123 Main St", email: "jacob@example.com" },
-  { name: "Matthew", address: "456 Oak Ave", email: "matthew@example.com" }
-];
+const customers = {
+  "123 Main St": "jacob@example.com",
+  "456 Oak Ave": "matthew@example.com",
+  "789 Pine Rd": "sara@example.com"
+};
 
 // --- Elements ---
-const nameInput = document.getElementById("customerName");
 const addressInput = document.getElementById("address");
 const emailInput = document.getElementById("email");
-const suggestions = document.getElementById("suggestions");
+const addressList = document.getElementById("addressList");
 const photoInput = document.getElementById("photo");
 const preview = document.getElementById("preview");
 const gpsOutput = document.getElementById("gps");
@@ -18,6 +18,19 @@ const popup = document.getElementById("popup");
 
 let photoData = null;
 let gpsData = null;
+
+// --- Fill datalist ---
+for (const addr in customers) {
+  const option = document.createElement("option");
+  option.value = addr;
+  addressList.appendChild(option);
+}
+
+// --- Auto-fill email ---
+addressInput.addEventListener("change", () => {
+  const email = customers[addressInput.value.trim()];
+  emailInput.value = email || "";
+});
 
 // --- Photo Upload ---
 photoInput.addEventListener("change", (event) => {
@@ -51,37 +64,6 @@ function updateGPS() {
 }
 updateGPS();
 
-// --- Suggestions Logic ---
-nameInput.addEventListener("input", () => {
-  const query = nameInput.value.toLowerCase();
-  suggestions.innerHTML = "";
-
-  if (!query) return;
-
-  const matches = customers.filter(c =>
-    c.name.toLowerCase().startsWith(query)
-  );
-
-  matches.forEach(c => {
-    const item = document.createElement("div");
-    item.textContent = c.name;
-    item.classList.add("suggestion-item");
-    item.addEventListener("click", () => {
-      nameInput.value = c.name;
-      addressInput.value = c.address;
-      emailInput.value = c.email;
-      suggestions.innerHTML = "";
-    });
-    suggestions.appendChild(item);
-  });
-});
-
-document.addEventListener("click", (e) => {
-  if (!suggestions.contains(e.target) && e.target !== nameInput) {
-    suggestions.innerHTML = "";
-  }
-});
-
 // --- Popup ---
 function showPopup(message, success = true) {
   popup.textContent = message;
@@ -94,12 +76,11 @@ function showPopup(message, success = true) {
 form.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  const name = nameInput.value.trim();
-  const email = emailInput.value.trim();
   const address = addressInput.value.trim();
+  const email = emailInput.value.trim();
   const reason = document.getElementById("reason").value.trim();
 
-  if (!name || !email || !address) {
+  if (!address || !email) {
     showPopup("❌ Please fill in all required fields", false);
     return;
   }
@@ -113,9 +94,8 @@ form.addEventListener("submit", (e) => {
   timeOutput.innerText = "Time: " + currentTime;
 
   const proofData = {
-    name,
-    email,
     address,
+    email,
     photoData: photoData || "No photo provided",
     gpsData,
     time: currentTime,
