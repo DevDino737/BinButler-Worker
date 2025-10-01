@@ -22,9 +22,9 @@ let gpsData = null;
 addressInput.addEventListener("input", () => {
   const entered = addressInput.value.trim();
   if (customers[entered]) {
-    emailInput.value = customers[entered];
+    emailInput.value = customers[entered]; // fills email automatically
   } else {
-    emailInput.value = "";
+    emailInput.value = ""; // clears if not in list
   }
 });
 
