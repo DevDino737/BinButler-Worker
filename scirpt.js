@@ -8,7 +8,6 @@ const customers = {
 // --- Elements ---
 const addressInput = document.getElementById("address");
 const emailInput = document.getElementById("email");
-const addressList = document.getElementById("addressList");
 const photoInput = document.getElementById("photo");
 const preview = document.getElementById("preview");
 const gpsOutput = document.getElementById("gps");
@@ -19,18 +18,11 @@ const popup = document.getElementById("popup");
 let photoData = null;
 let gpsData = null;
 
-// --- Fill datalist ---
-for (const addr in customers) {
-  const option = document.createElement("option");
-  option.value = addr;
-  addressList.appendChild(option);
-}
-
-// --- Auto-fill email as you type ---
+// --- Fill email when address matches ---
 addressInput.addEventListener("input", () => {
-  const enteredAddress = addressInput.value.trim();
-  if (customers[enteredAddress]) {
-    emailInput.value = customers[enteredAddress];
+  const entered = addressInput.value.trim();
+  if (customers[entered]) {
+    emailInput.value = customers[entered];
   } else {
     emailInput.value = "";
   }
@@ -51,7 +43,7 @@ photoInput.addEventListener("change", (event) => {
 // --- GPS ---
 function updateGPS() {
   if (!navigator.geolocation) {
-    gpsOutput.innerText = "GPS not supported on this device";
+    gpsOutput.innerText = "GPS not supported";
     return;
   }
   navigator.geolocation.getCurrentPosition(
@@ -68,7 +60,7 @@ function updateGPS() {
 }
 updateGPS();
 
-// --- Popup (success/fail) ---
+// --- Popup ---
 function showPopup(message, success = true) {
   popup.textContent = message;
   popup.style.background = success ? "#4caf50" : "#d41010";
@@ -76,37 +68,54 @@ function showPopup(message, success = true) {
   setTimeout(() => popup.classList.remove("show"), 3000);
 }
 
-// --- Form Submit ---
-form.addEventListener("submit", (e) => {
+// --- Submit Form ---
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const address = addressInput.value.trim();
   const email = emailInput.value.trim();
   const reason = document.getElementById("reason").value.trim();
+  const currentTime = new Date().toLocaleString();
+  timeOutput.innerText = "Time: " + currentTime;
 
   if (!address || !email) {
-    showPopup("❌ Please fill in all required fields", false);
+    showPopup("❌ Address or email missing", false);
     return;
   }
-
   if (!photoData && !reason) {
     showPopup("❌ Provide a photo or a reason", false);
     return;
   }
 
-  const currentTime = new Date().toLocaleString();
-  timeOutput.innerText = "Time: " + currentTime;
-
   const proofData = {
     address,
     email,
-    photoData: photoData || "No photo provided",
+    photoData,
     gpsData,
     time: currentTime,
     reason: reason || "Pickup completed"
   };
 
-  console.log("Captured Proof:", proofData);
-  showPopup("✅ Proof submitted successfully!");
+  try {
+    const res = await fetch("https://script.google.com/macros/s/AKfycbwDfnbxctuWcIa75PPgof_IwdWnuB7c_OPCrGPeBRokTbwoRObe8LVCjkrWVlipM87l/exec", {
+      method: "POST",
+      body: JSON.stringify(proofData)
+    });
+    const result = await res.json();
+
+    if (result.success) {
+      showPopup("✅ Proof sent successfully!");
+      // Reset photo & reason
+      photoInput.value = "";
+      preview.src = "";
+      document.getElementById("reason").value = "";
+      photoData = null;
+    } else {
+      showPopup("❌ Error sending proof", false);
+    }
+  } catch (err) {
+    console.error(err);
+    showPopup("❌ Network error", false);
+  }
 });
 
