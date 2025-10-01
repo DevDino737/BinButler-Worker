@@ -20,11 +20,20 @@ let gpsData = null;
 
 // --- Auto-fill email ---
 addressInput.addEventListener("input", () => {
-  const entered = addressInput.value.trim();
-  if (customers[entered]) {
-    emailInput.value = customers[entered];
+  const entered = addressInput.value.trim().toLowerCase();
+  let found = false;
+  for (const addr in customers) {
+    if (addr.toLowerCase() === entered) {
+      emailInput.value = customers[addr];
+      found = true;
+      break;
+    }
+  }
+  if (!found) {
+    emailInput.value = ""; // clear if no match
   }
 });
+
 
 // --- Photo Upload ---
 photoInput.addEventListener("change", (event) => {
