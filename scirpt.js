@@ -18,11 +18,11 @@ const popup = document.getElementById("popup");
 let photoData = null;
 let gpsData = null;
 
-// --- Auto-fill email when address matches ---
+// --- Auto-fill email ---
 addressInput.addEventListener("input", () => {
   const entered = addressInput.value.trim();
   if (customers[entered]) {
-    emailInput.value = customers[entered]; // auto-fill
+    emailInput.value = customers[entered];
   }
 });
 
@@ -74,7 +74,7 @@ form.addEventListener("submit", async (e) => {
   const email = emailInput.value.trim();
   const reason = document.getElementById("reason").value.trim();
   const currentTime = new Date().toLocaleString();
-  timeOutput.innerText = "Time: " + currentTime; // <-- fixed timestamp display
+  timeOutput.innerText = "Time: " + currentTime;
 
   if (!address || !email) {
     showPopup("❌ Address or email missing", false);
@@ -115,5 +115,3 @@ form.addEventListener("submit", async (e) => {
     showPopup("❌ Network error", false);
   }
 });
-
-
