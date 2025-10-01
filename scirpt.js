@@ -21,18 +21,18 @@ let gpsData = null;
 // --- Auto-fill email ---
 addressInput.addEventListener("input", () => {
   const entered = addressInput.value.trim().toLowerCase();
-  let found = false;
+  let matchEmail = "";
+
   for (const addr in customers) {
     if (addr.toLowerCase() === entered) {
-      emailInput.value = customers[addr];
-      found = true;
+      matchEmail = customers[addr];
       break;
     }
   }
-  if (!found) {
-    emailInput.value = ""; // clear if no match
-  }
+
+  emailInput.value = matchEmail; // auto-fill if match, else empty
 });
+
 
 
 // --- Photo Upload ---
