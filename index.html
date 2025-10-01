@@ -1,48 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BinButler Worker Proof</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bin Butler Proof Form</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>BinButler Proof Capture</h1>
-    <p class="subtitle">Submit photo proof or explain why pickup was skipped.</p>
-
-    <form id="proofForm">
-      <!-- Address -->
-      <label for="address">Customer Address</label>
-      <input list="addressList" id="address" placeholder="Enter customer address..." required>
-      <datalist id="addressList"></datalist>
-
-      <!-- Email -->
-      <label for="email">Customer Email</label>
-      <input type="email" id="email" placeholder="Customer email">
-
-
-      <!-- Photo Upload -->
-      <label for="photo">Upload Photo Proof</label>
-      <input type="file" id="photo" accept="image/*" capture="environment">
-      <img id="preview" alt="Preview will appear here">
-
-      <!-- Skip Reason -->
-      <label for="reason">Skip Reason (optional)</label>
-      <textarea id="reason" placeholder="Explain why pickup was skipped..."></textarea>
-
-      <!-- GPS + Time -->
-      <p id="gps">GPS: Loading...</p>
-      <p id="timestamp">Time: --</p>
-
-      <!-- Submit Button -->
-      <button type="submit">Send Proof</button>
-
-      <!-- Success / Fail Popup -->
-      <div id="popup" class="popup"></div>
-    </form>
-  </div>
-
+  <h1>Bin Butler Proof Form</h1>
+  <form id="proofForm">
+    <input type="text" id="address" placeholder="Enter customer address" autocomplete="off">
+    <input type="email" id="email" placeholder="Customer email">
+    <input type="file" id="photo" accept="image/*">
+    <img id="preview" src="" alt="Photo preview">
+    <textarea id="reason" placeholder="Skip reason (optional)"></textarea>
+    <div id="gps">GPS: not available</div>
+    <div id="timestamp">Time: </div>
+    <button type="submit">Send Proof</button>
+  </form>
+  <div id="popup"></div>
+  
   <script src="script.js"></script>
 </body>
 </html>
