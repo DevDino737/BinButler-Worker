@@ -26,10 +26,14 @@ for (const addr in customers) {
   addressList.appendChild(option);
 }
 
-// --- Auto-fill email ---
-addressInput.addEventListener("change", () => {
-  const email = customers[addressInput.value.trim()];
-  emailInput.value = email || "";
+// --- Auto-fill email as you type ---
+addressInput.addEventListener("input", () => {
+  const enteredAddress = addressInput.value.trim();
+  if (customers[enteredAddress]) {
+    emailInput.value = customers[enteredAddress];
+  } else {
+    emailInput.value = "";
+  }
 });
 
 // --- Photo Upload ---
@@ -64,7 +68,7 @@ function updateGPS() {
 }
 updateGPS();
 
-// --- Popup ---
+// --- Popup (success/fail) ---
 function showPopup(message, success = true) {
   popup.textContent = message;
   popup.style.background = success ? "#4caf50" : "#d41010";
@@ -105,3 +109,4 @@ form.addEventListener("submit", (e) => {
   console.log("Captured Proof:", proofData);
   showPopup("✅ Proof submitted successfully!");
 });
+
