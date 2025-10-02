@@ -137,7 +137,6 @@ submitBtn.addEventListener("click", async () => {
     }
   } catch (err) {
     console.error(err);
-    showPopup("❌ Network error", false);
+    showPopup("❌ Network error, try again", false);
   }
 });
-
