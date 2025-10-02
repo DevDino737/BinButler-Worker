@@ -1,126 +1,119 @@
-// --- Customer Database ---
 const customers = {
   "123 Main St": "jacob@example.com",
   "456 Oak Ave": "matthew@example.com",
   "789 Pine Rd": "sara@example.com"
 };
 
-// --- Elements ---
 const addressInput = document.getElementById("address");
 const emailInput = document.getElementById("email");
 const photoInput = document.getElementById("photo");
 const preview = document.getElementById("preview");
-const gpsOutput = document.getElementById("gps");
-const timeOutput = document.getElementById("timestamp");
-const form = document.getElementById("proofForm");
+const gpsDisplay = document.getElementById("gps");
+const timeDisplay = document.getElementById("timestamp");
+const reasonInput = document.getElementById("reason");
+const submitBtn = document.getElementById("submitBtn");
 const popup = document.getElementById("popup");
 
-let photoData = null;
 let gpsData = null;
 
-// --- Auto-fill email ---
+// Autofill email while typing (partial match, case-insensitive)
 addressInput.addEventListener("input", () => {
   const entered = addressInput.value.trim().toLowerCase();
-  let matchEmail = "";
+  let foundEmail = "";
 
-  for (const addr in customers) {
-    if (addr.toLowerCase() === entered) {
-      matchEmail = customers[addr];
-      break;
+  if (entered.length > 0) {
+    for (const addr in customers) {
+      if (addr.toLowerCase().startsWith(entered)) {
+        foundEmail = customers[addr];
+        break;
+      }
     }
   }
 
-  emailInput.value = matchEmail; // auto-fill if match, else empty
+  emailInput.value = foundEmail;
 });
 
-
-
-// --- Photo Upload ---
-photoInput.addEventListener("change", (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    photoData = e.target.result;
-    preview.src = photoData;
-  };
-  reader.readAsDataURL(file);
-});
-
-// --- GPS ---
-function updateGPS() {
-  if (!navigator.geolocation) {
-    gpsOutput.innerText = "GPS not supported";
-    return;
+// Show image preview
+photoInput.addEventListener("change", () => {
+  const file = photoInput.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      preview.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
   }
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      const { latitude, longitude } = pos.coords;
-      gpsData = { latitude, longitude };
-      gpsOutput.innerText = `GPS: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
-    },
-    (err) => {
-      gpsOutput.innerText = "GPS unavailable";
-      console.error(err);
-    }
-  );
-}
-updateGPS();
+});
 
-// --- Popup ---
-function showPopup(message, success = true) {
-  popup.textContent = message;
-  popup.style.background = success ? "#4caf50" : "#d41010";
-  popup.classList.add("show");
-  setTimeout(() => popup.classList.remove("show"), 3000);
+// Capture GPS
+if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(pos => {
+    gpsData = {
+      latitude: pos.coords.latitude,
+      longitude: pos.coords.longitude
+    };
+    gpsDisplay.textContent = `GPS: ${gpsData.latitude.toFixed(5)}, ${gpsData.longitude.toFixed(5)}`;
+  });
 }
 
-// --- Submit Form ---
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+// Capture time
+function updateTime() {
+  const now = new Date();
+  timeDisplay.textContent = `Time: ${now.toLocaleString()}`;
+}
+updateTime();
+setInterval(updateTime, 1000);
 
+// Submit form
+submitBtn.addEventListener("click", async () => {
   const address = addressInput.value.trim();
   const email = emailInput.value.trim();
-  const reason = document.getElementById("reason").value.trim();
-  const currentTime = new Date().toLocaleString();
-  timeOutput.innerText = "Time: " + currentTime;
+  const reason = reasonInput.value.trim();
+  const time = new Date().toISOString();
 
   if (!address || !email) {
-    showPopup("❌ Address or email missing", false);
-    return;
-  }
-  if (!photoData && !reason) {
-    showPopup("❌ Provide a photo or a reason", false);
+    alert("Please enter a valid address and email.");
     return;
   }
 
-  const proofData = {
-    address,
-    email,
-    photoData,
-    gpsData,
-    time: currentTime,
-    reason: reason || "Pickup completed"
-  };
+  let photoData = null;
+  if (photoInput.files[0]) {
+    const reader = new FileReader();
+    reader.onload = async e => {
+      photoData = e.target.result;
+      await sendData();
+    };
+    reader.readAsDataURL(photoInput.files[0]);
+  } else {
+    await sendData();
+  }
 
-  try {
-    const res = await fetch("https://script.google.com/macros/s/AKfycbwDfnbxctuWcIa75PPgof_IwdWnuB7c_OPCrGPeBRokTbwoRObe8LVCjkrWVlipM87l/exec", {
-      method: "POST",
-      body: JSON.stringify(proofData)
-    });
-    const result = await res.json();
+  async function sendData() {
+    const payload = {
+      address,
+      email,
+      reason,
+      gpsData,
+      time,
+      photoData
+    };
 
-    if (result.success) {
-      showPopup("✅ Proof sent successfully!");
-      photoInput.value = "";
-      preview.src = "";
-      document.getElementById("reason").value = "";
-      photoData = null;
-    } else {
-      showPopup("❌ Error sending proof", false);
+    try {
+      const res = await fetch("YOUR_SCRIPT_WEBAPP_URL_HERE", {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+      const result = await res.json();
+
+      if (result.success) {
+        popup.textContent = "Submitted successfully!";
+        popup.classList.add("show");
+        setTimeout(() => popup.classList.remove("show"), 3000);
+      } else {
+        alert("Error: " + result.error);
+      }
+    } catch (err) {
+      alert("Network error: " + err);
     }
-  } catch (err) {
-    console.error(err);
-    showPopup("❌ Network error", false);
   }
 });
