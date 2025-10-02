@@ -25,7 +25,7 @@ function checkAddress() {
 
   if (entered.length > 0) {
     for (const addr in customers) {
-      if (addr.toLowerCase().startsWith(entered)) {
+      if (addr.toLowerCase().includes(entered)) {
         foundEmail = customers[addr];
         break;
       }
@@ -34,6 +34,7 @@ function checkAddress() {
 
   emailInput.value = foundEmail;
 }
+
 
 // Runs on typing
 addressInput.addEventListener("input", checkAddress);
