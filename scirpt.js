@@ -25,6 +25,7 @@ function checkAddress() {
 
   if (entered.length > 0) {
     for (const addr in customers) {
+      // use "includes" instead of "startsWith" for more flexible matching
       if (addr.toLowerCase().includes(entered)) {
         foundEmail = customers[addr];
         break;
@@ -35,26 +36,21 @@ function checkAddress() {
   emailInput.value = foundEmail;
 }
 
-
-// Runs on typing
+// Trigger checks
 addressInput.addEventListener("input", checkAddress);
-
-// Runs when leaving field OR pressing Enter
 addressInput.addEventListener("change", checkAddress);
-
-// --- Allow Enter key to also run autofill ---
 addressInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
-    checkAddress(); // fill in email right away
+    checkAddress();
   }
 });
 
-// --- Allow Enter key anywhere to trigger submit ---
+// --- Allow Enter anywhere to act like "submit" ---
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && e.target.tagName !== "TEXTAREA") {
-    e.preventDefault();
-    submitBtn.click();
+  if (e.key === "Enter" && e.target !== addressInput) {
+    e.preventDefault(); // stop accidental form reload
+    submitBtn.click();  // trigger submit
   }
 });
 
@@ -138,6 +134,6 @@ submitBtn.addEventListener("click", async () => {
     }
   } catch (err) {
     console.error(err);
-    showPopup("❌ Network error, try again", false);
+    showPopup("❌ Network error", false);
   }
 });
