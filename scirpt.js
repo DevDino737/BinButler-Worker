@@ -2,7 +2,8 @@
 const customers = {
   "123 Main St": "jacob@example.com",
   "456 Oak Ave": "matthew@example.com",
-  "789 Pine Rd": "sara@example.com"
+  "789 Pine Rd": "sara@example.com",
+  "781 John Rd": "Wyatt@example.com"
 };
 
 // --- Elements ---
@@ -134,6 +135,6 @@ submitBtn.addEventListener("click", async () => {
     }
   } catch (err) {
     console.error(err);
-    showPopup("❌ Network error", false);
+    showPopup("❌ Network error, try again", false);
   }
 });
