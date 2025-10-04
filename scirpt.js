@@ -3,7 +3,7 @@ const customers = {
   "123 Main St": "jacob@example.com",
   "456 Oak Ave": "matthew@example.com",
   "789 Pine Rd": "sara@example.com",
-  "781 John Rd": "Wyatt@example.com"
+  "781 John Rd": "wyattmathew13@gmail.com"
 };
 
 // --- Elements ---
