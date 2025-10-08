@@ -26,7 +26,7 @@ function checkAddress() {
 
   if (entered.length > 0) {
     for (const addr in customers) {
-      // use "includes" instead of "startsWith" for more flexible matching
+      // "includes" allows partial matches
       if (addr.toLowerCase().includes(entered)) {
         foundEmail = customers[addr];
         break;
@@ -122,10 +122,11 @@ submitBtn.addEventListener("click", async () => {
   };
 
   try {
-    const res = await fetch("https://script.google.com/macros/s/AKfycbwDfnbxctuWcIa75PPgof_IwdWnuB7c_OPCrGPeBRokTbwoRObe8LVCjkrWVlipM87l/exec", {
+    const res = await fetch("https://script.google.com/macros/s/AKfycbzZNL6fT9dUTeiQIenuzq8aCN7HTSvqm6vQ3ZxReihmfrcD4LWWlQ_mS0jPVCJfVyrO/exec", {
       method: "POST",
       body: JSON.stringify(proofData)
     });
+
     const result = await res.json();
 
     if (result.success) {
