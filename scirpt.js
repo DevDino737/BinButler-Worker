@@ -122,7 +122,7 @@ submitBtn.addEventListener("click", async () => {
   };
 
   try {
-    const res = await fetch("https://script.google.com/macros/s/AKfycbztn_M7RvWj9pOtS52Cfz_xPL8WvtxrhmlSwLMC_LypTGqE9PpvU88p_N0ueNh8v6eF/exec", {
+    const res = await fetch("https://script.google.com/macros/s/AKfycbwslgOV5sTVGpkwpAZDmF4YURUgEU2A1_1VxHhHoKwRQ1dyQPPBTi3uZ5a-qORC6p3p/exec", {
       method: "POST",
       body: JSON.stringify(proofData)
     });
