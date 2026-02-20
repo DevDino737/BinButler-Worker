@@ -4,7 +4,7 @@ const customers = {
   "456 Oak Ave": "matthew@example.com",
   "789 Pine Rd": "jaymathew25@gmail.com",
   "781 John Rd": "wyattmathew13@gmail.com",
-  "101 Green forset estate drive": "wyattmathew@icloud.com"
+  "101 green forest estate drive": "wyattmathew@icloud.com"
 };
 
 // --- Elements ---
