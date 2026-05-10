@@ -1,15 +1,5 @@
-// --- Customer Database ---
-const customers = {
-  "123 Main St": "jacob@example.com",
-  "456 Oak Ave": "matthew@example.com",
-  "789 Pine Rd": "jaymathew25@gmail.com",
-  "781 John Rd": "wyattmathew13@gmail.com",
-  "101 green forest estate drive": "wyattmathew@icloud.com"
-};
-
 // --- Elements ---
 const addressInput = document.getElementById("address");
-const emailInput = document.getElementById("email");
 const photoInput = document.getElementById("photo");
 const preview = document.getElementById("preview");
 const gpsOutput = document.getElementById("gps");
@@ -20,37 +10,9 @@ const popup = document.getElementById("popup");
 let photoData = null;
 let gpsData = null;
 
-// --- Address check & autofill ---
-function checkAddress() {
-  const entered = addressInput.value.trim().toLowerCase();
-  let foundEmail = "";
-
-  if (entered.length > 0) {
-    for (const addr in customers) {
-      // "includes" allows partial matches
-      if (addr.toLowerCase().includes(entered)) {
-        foundEmail = customers[addr];
-        break;
-      }
-    }
-  }
-
-  emailInput.value = foundEmail;
-}
-
-// Trigger checks
-addressInput.addEventListener("input", checkAddress);
-addressInput.addEventListener("change", checkAddress);
-addressInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    checkAddress();
-  }
-});
-
 // --- Allow Enter anywhere to act like "submit" ---
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && e.target !== addressInput) {
+  if (e.key === "Enter") {
     e.preventDefault(); // stop accidental form reload
     submitBtn.click();  // trigger submit
   }
@@ -99,23 +61,21 @@ function showPopup(message, success = true) {
 // --- Submit Proof ---
 submitBtn.addEventListener("click", async () => {
   const address = addressInput.value.trim();
-  const email = emailInput.value.trim();
   const reason = document.getElementById("reason").value.trim();
   const currentTime = new Date().toLocaleString();
   timeOutput.innerText = "Time: " + currentTime;
 
-  if (!address || !email) {
-    showPopup("❌ Address or email missing", false);
+  if (!address) {
+    showPopup("Address missing", false);
     return;
   }
   if (!photoData && !reason) {
-    showPopup("❌ Provide a photo or the reason", false);
+    showPopup("Provide a photo or the reason", false);
     return;
   }
 
   const proofData = {
     address,
-    email,
     photoData,
     gpsData,
     time: currentTime,
@@ -131,12 +91,12 @@ submitBtn.addEventListener("click", async () => {
     const result = await res.json();
 
     if (result.success) {
-      showPopup("✅ Proof sent successfully!");
+      showPopup("Proof saved to Google Sheet!");
     } else {
-      showPopup("❌ Error sending proof", false);
+      showPopup("Error saving proof", false);
     }
   } catch (err) {
     console.error(err);
-    showPopup("❌ Network error, try again", false);
+    showPopup("Network error, try again", false);
   }
 });
