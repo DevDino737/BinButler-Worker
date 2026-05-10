@@ -6,9 +6,47 @@ const gpsOutput = document.getElementById("gps");
 const timeOutput = document.getElementById("timestamp");
 const submitBtn = document.getElementById("submitBtn");
 const popup = document.getElementById("popup");
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyHQb9Hb8OpcySwzevOFj6EhZqZEAAYtwwJaDoXPkJquuWapdwyuRghKvNJMaJjC-X2/exec";
 
 let photoData = null;
 let gpsData = null;
+let isSubmitting = false;
+
+function setSubmitting(submitting) {
+  isSubmitting = submitting;
+  submitBtn.disabled = submitting;
+  submitBtn.textContent = submitting ? "Saving..." : "Submit Proof";
+  submitBtn.classList.toggle("loading", submitting);
+}
+
+function resizePhoto(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const img = new Image();
+
+      img.onload = () => {
+        const maxSize = 1200;
+        const scale = Math.min(maxSize / img.width, maxSize / img.height, 1);
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        resolve(canvas.toDataURL("image/jpeg", 0.75));
+      };
+
+      img.onerror = () => reject(new Error("Could not read photo"));
+      img.src = reader.result;
+    };
+
+    reader.onerror = () => reject(new Error("Could not load photo"));
+    reader.readAsDataURL(file);
+  });
+}
 
 // --- Allow Enter anywhere to act like "submit" ---
 document.addEventListener("keydown", (e) => {
@@ -19,15 +57,21 @@ document.addEventListener("keydown", (e) => {
 });
 
 // --- Photo Upload ---
-photoInput.addEventListener("change", (event) => {
+photoInput.addEventListener("change", async (event) => {
   const file = event.target.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    photoData = e.target.result;
+
+  try {
+    showPopup("Preparing photo...");
+    photoData = await resizePhoto(file);
     preview.src = photoData;
-  };
-  reader.readAsDataURL(file);
+    showPopup("Photo ready");
+  } catch (err) {
+    console.error(err);
+    photoData = null;
+    preview.removeAttribute("src");
+    showPopup("Could not load photo", false);
+  }
 });
 
 // --- GPS ---
@@ -60,6 +104,8 @@ function showPopup(message, success = true) {
 
 // --- Submit Proof ---
 submitBtn.addEventListener("click", async () => {
+  if (isSubmitting) return;
+
   const address = addressInput.value.trim();
   const reason = document.getElementById("reason").value.trim();
   const currentTime = new Date().toLocaleString();
@@ -83,20 +129,22 @@ submitBtn.addEventListener("click", async () => {
   };
 
   try {
-    const res = await fetch("https://script.google.com/macros/s/AKfycbyHQb9Hb8OpcySwzevOFj6EhZqZEAAYtwwJaDoXPkJquuWapdwyuRghKvNJMaJjC-X2/exec", {
+    setSubmitting(true);
+
+    await fetch(SCRIPT_URL, {
       method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
       body: JSON.stringify(proofData)
     });
 
-    const result = await res.json();
-
-    if (result.success) {
-      showPopup("Proof saved to Google Sheet!");
-    } else {
-      showPopup("Error saving proof", false);
-    }
+    showPopup("Proof sent to Google Sheet!");
   } catch (err) {
     console.error(err);
-    showPopup("Network error, try again", false);
+    showPopup("Upload failed, try again", false);
+  } finally {
+    setSubmitting(false);
   }
 });

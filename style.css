@@ -92,6 +92,34 @@ button:hover {
   color: #d41010;
 }
 
+button:disabled {
+  cursor: wait;
+  opacity: 0.8;
+}
+
+button.loading {
+  position: relative;
+}
+
+button.loading::after {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-left: 10px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  vertical-align: -2px;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Popup */
 .popup {
   position: fixed;
