@@ -7,10 +7,22 @@ const timeOutput = document.getElementById("timestamp");
 const submitBtn = document.getElementById("submitBtn");
 const popup = document.getElementById("popup");
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyHQb9Hb8OpcySwzevOFj6EhZqZEAAYtwwJaDoXPkJquuWapdwyuRghKvNJMaJjC-X2/exec";
+const CUSTOMER_ADDRESSES = [
+  "28, Twelve Oaks Ct",
+  "616 Biltmore Way",
+  "801 nancy lane"
+];
 
 let photoData = null;
 let gpsData = null;
 let isSubmitting = false;
+
+CUSTOMER_ADDRESSES.forEach((address) => {
+  const option = document.createElement("option");
+  option.value = address;
+  option.textContent = address;
+  addressInput.appendChild(option);
+});
 
 function setSubmitting(submitting) {
   isSubmitting = submitting;
@@ -125,7 +137,7 @@ submitBtn.addEventListener("click", async () => {
     photoData,
     gpsData,
     time: currentTime,
-    reason: reason || "Pickup completed"
+    reason: reason || "Pickup complete"
   };
 
   try {

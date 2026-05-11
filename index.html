@@ -15,10 +15,12 @@
     <p class="subtitle">Submit pickup details</p>
 
     <label for="address">Address</label>
-    <input type="text" id="address" placeholder="Enter Customer address">
+    <select id="address">
+      <option value="">Select customer address</option>
+    </select>
 
     <label for="reason">Reason / Status</label>
-    <textarea id="reason" placeholder="Pickup completed, bin not out, etc."></textarea>
+    <textarea id="reason" placeholder="Pickup complete, bin not out, etc.">Done!</textarea>
 
     <label for="photo">Upload Proof Photo</label>
     <input type="file" id="photo" accept="image/*">
